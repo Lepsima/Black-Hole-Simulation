@@ -32,7 +32,7 @@ Results:
 _Rainbow disk by further alterating the settings to whatever this is: 3000K at the tip, +20000k at the center._
 <br />
 
-## Settings
+## Customization & How to change things
 Almost all the fun parameters are exposed in a .json file for you to edit at your pleasure
 
 The settings file is auto-generated after the first run, and can be opened in-app by clicking "O". (Also, press "P" to see the default settings).<br />
