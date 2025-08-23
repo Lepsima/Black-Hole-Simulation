@@ -74,6 +74,7 @@ public class TextRenderer {
                 lines.Add("\n  \"the magical -3/2 * h2 * r^(-5)\" -> Riccardo Antonelli");
                 lines.Add("\n  Bloom effect for Monogame/XNA -> Kosmonaut3d");
                 lines.Add("\n  Monogame fork for Compute Shaders -> Markus Hotzinger (cpt-max)");
+                lines.Add("\n  Made by Lepsima");
                 
                 lines.Add("\n\n[B] Go back");
                 break;

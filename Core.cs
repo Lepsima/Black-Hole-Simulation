@@ -83,13 +83,16 @@ public class Core : Game {
 
     private void ApplySettings() 
     {
+        // Read updated settings
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
-        screenRect = new Rectangle(0, 0, Settings.ResolutionX, Settings.ResolutionY); 
         
+        // Update window size
+        screenRect = new Rectangle(0, 0, Settings.ResolutionX, Settings.ResolutionY); 
         graphics.PreferredBackBufferWidth = Settings.ResolutionX;
         graphics.PreferredBackBufferHeight = Settings.ResolutionY;
         graphics.ApplyChanges();
         
+        // Update the configuration of all the scripts
         Configurable.ApplySettingsToAll();
     }
     
