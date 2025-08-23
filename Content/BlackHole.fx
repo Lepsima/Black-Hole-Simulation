@@ -1,6 +1,6 @@
 ﻿RWTexture2D<float4> output;  // The texture to write the ray color to
 Texture2D<float1> noise_tex; // The noise texture has only 1 channel (red), since it is greyscale
-Texture2D<float3> background_tex; // The noise texture has only 1 channel (red), since it is greyscale
+Texture2D<float3> background_tex; // Skybox texture, 3 channels, no alpha
 const int width;
 const int height;
 const float disk_time;
