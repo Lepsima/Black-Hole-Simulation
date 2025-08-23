@@ -1,4 +1,4 @@
-# A performant black hole renderer written in C# and HLSL using Monogame
+# A performant black hole renderer in C# and HLSL
 This renderer does it's best to ray-trace in real time an interactive black hole with an accretion disk, you can move rotate and zoom in anywhere you want
 
 ## Main Features:
