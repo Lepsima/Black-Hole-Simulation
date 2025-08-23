@@ -20,11 +20,7 @@ public class Camera {
 	private float aim_azimuth = float.Pi;
 	private float aim_elevation = float.Pi / 1.9f;
 	
-	private bool isOrbiting;
-	private bool isAiming;
-	
-	private int lastX;
-	private int lastY;
+	private Point lastMousePosition;
 	private int lastScroll;
 
 	public Camera() {
@@ -33,66 +29,67 @@ public class Camera {
 
 	public Vector3[] GetShaderData() {
 		Vector3[] data = new Vector3[4];
-		data[0] = Position();
-		data[1] = Vector3.Normalize(Direction());
+		data[0] = GetVector(orbit_elevation, orbit_azimuth);
+		data[1] = Vector3.Normalize(GetVector(aim_elevation, aim_azimuth + orbit_azimuth));
 		data[2] = Vector3.Normalize(Vector3.Cross(data[1], Vector3.Up));
 		data[3] = Vector3.Normalize(Vector3.Cross(data[2], data[1]));
 		return data;
 	}
+
+	private Vector3 GetVector(float elevation, float azimuth) {
+		return new Vector3(
+			radius * MathF.Sin(elevation) * MathF.Cos(azimuth),
+			radius * MathF.Cos(elevation),
+			radius * MathF.Sin(elevation) * MathF.Sin(azimuth)
+		);
+	}
 	
-	public Vector3 Position() {
-		return new Vector3(
-			radius * MathF.Sin(orbit_elevation) * MathF.Cos(orbit_azimuth),
-			radius * MathF.Cos(orbit_elevation),
-			radius * MathF.Sin(orbit_elevation) * MathF.Sin(orbit_azimuth)
-		);
-	}
-
-	public Vector3 Direction() {
-		return new Vector3(
-			MathF.Sin(aim_elevation) * MathF.Cos(aim_azimuth + orbit_azimuth),
-			MathF.Cos(aim_elevation),
-			MathF.Sin(aim_elevation) * MathF.Sin(aim_azimuth + orbit_azimuth)
-		);
-	}
-
 	public void Update() {
 		MouseState mouseState = Mouse.GetState();
 		
-		// Scroll zoom
+		// Scroll delta
 		int scroll = mouseState.ScrollWheelValue;
 		int deltaScroll = scroll - lastScroll;
-
-		radius = Math.Clamp(radius - deltaScroll * zoomSpeed, minRadius, maxRadius);
 		lastScroll = scroll;
 		
 		// Position delta
-		int x = mouseState.Position.X;
-		int y = mouseState.Position.Y;
-
-		float dx = x - lastX;
-		float dy = y - lastY;
+		Point mousePosition = mouseState.Position; 
+		Point delta = mousePosition - lastMousePosition;
+		lastMousePosition = mousePosition;
 		
-		lastX = x;
-		lastY = y;
+		// Zoom
+		radius = Math.Clamp(radius - deltaScroll * zoomSpeed, minRadius, maxRadius);
 		
-		if (dx == 0 && dy == 0) return;
+		// Camera movement
+		if (delta is { X: 0, Y: 0 }) return;
 
 		// Movement type
-		isOrbiting = mouseState.LeftButton == ButtonState.Pressed || mouseState.MiddleButton == ButtonState.Pressed;
-		isAiming = mouseState.RightButton == ButtonState.Pressed;
+		bool isOrbiting = mouseState.LeftButton == ButtonState.Pressed;
+		bool isMiddleClicking = mouseState.MiddleButton == ButtonState.Pressed;
+		bool isAiming = mouseState.RightButton == ButtonState.Pressed;
 		
 		// Orbit camera around center
 		if (isOrbiting && !isAiming) {
-			orbit_azimuth -= dx * orbitSpeed;
-			orbit_elevation -= dy * orbitSpeed * 0.25f;
+			// Elevate up or down
+			orbit_elevation -= delta.Y * orbitSpeed * 0.25f;
 			orbit_elevation = Math.Clamp(orbit_elevation, 0.01f, float.Pi - 0.01f);
 			
-			// Aim camera freely
+			// Horizontal orbit
+			orbit_azimuth -= delta.X * orbitSpeed;
+
 		} else if (isAiming) {
-			aim_azimuth += dx * aimSpeed;
-			aim_elevation -= dy * aimSpeed;
+			// Aim camera without position movement
+			aim_azimuth += delta.X * aimSpeed;
+			aim_elevation -= delta.Y * aimSpeed;
 			aim_elevation = Math.Clamp(aim_elevation, 0.01f, float.Pi - 0.01f);
+			
+		} else if (isMiddleClicking) {
+			// Elevate up or down
+			orbit_elevation -= delta.Y * orbitSpeed * 0.25f;
+			orbit_elevation = Math.Clamp(orbit_elevation, 0.01f, float.Pi - 0.01f);
+			
+			// Aim camera horizontally
+			aim_azimuth += delta.X * aimSpeed;
 		}
 	}
 }

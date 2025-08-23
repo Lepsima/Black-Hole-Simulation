@@ -102,6 +102,7 @@ public class TextRenderer {
                 lines.Add("\nHold a mouse button down and drag");
                 lines.Add("  [RMB] Right click -> Aim the camera");
                 lines.Add("  [LMB] Left click -> Move the camera");
+                lines.Add("  [MMB] Middle click -> Alternate movement, mixed controls");
                 
                 lines.Add("\n Use the [SCROLL] scroll wheel to zoom in and out");
                 
