@@ -1,4 +1,30 @@
-﻿# Credits & Links
+# A performant black hole renderer written in C# and HLSL using Monogame
+This renderer does it's best to ray-trace in real time an interactive black hole with an accretion disk, you can move rotate and zoom in anywhere you want
+
+## Main Features:
+- Light bending
+- Accretion disk with volume (NOT volumetric, just 3D)
+- Accretion disk's light emmision based on temperature and measured in nm wavelength
+- wavelength redshift based on the disk's light direction
+- the modified wavelength back to rgb
+- Skybox distorsion, the stars in the background will also distort
+
+## Performance 
+I tested on 2 devices with the GPUs: rtx4060 (desktop) and Intel Raptor Lake-P (laptop), giving the following results:
+Desktop: 1920x1080p at ~300fps average (depends on the distance) 
+Laptop: 1280x720p at 60-30fps average (depends on the distance) 
+
+## Settings
+Almost all the fun parameters are exposed in a .json file for you to edit at your pleasure
+
+Some of the best parameters to change and play with are:
+- FOV
+- Step size (increase this one for a performace boost)
+- Disk radius
+- Disk temperature (this one will change the percieved color in the final image)
+- Disk velocity
+ 
+# Credits & Links
 
 ## _"The magical  `-1.5 * h2 * r^(-5)`"_
 A very FAST equation to get the direction of a light ray near a black hole
