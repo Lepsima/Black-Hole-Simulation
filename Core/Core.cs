@@ -15,7 +15,6 @@ public class Core : Game {
     
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    private Rectangle screenRect;
 
     private Camera _camera;
     private BlackHole _blackHole;
@@ -23,9 +22,10 @@ public class Core : Game {
     private BloomFilter _bloomFilter;
     private TextRenderer _textRenderer;
     private InputHandler _inputHandler;
+    private FrameRenderer _frameRenderer;
 
-    private bool _isMenuOpen;
-    private Menu _currentMenu = Menu.Main;
+    public static bool IsMenuOpen { get; private set; }
+    public static Menu CurrentMenu { get; private set; } = Menu.Main;
 
     private Process settingsProcess;
     private Process defaultsProcess;
@@ -63,6 +63,7 @@ public class Core : Game {
         _bloomFilter = new BloomFilter();
         _textRenderer = new TextRenderer();
         _inputHandler = new InputHandler();
+        _frameRenderer = new FrameRenderer();
 
         // Create events for keyboard presses
         CreateInputEvents();
@@ -79,6 +80,7 @@ public class Core : Game {
         _textRenderer.Load(Content, spriteBatch);
         _blackHole.Load(GraphicsDevice, Content);
         _bloomFilter.Load(GraphicsDevice, Content);
+        _frameRenderer.Load(GraphicsDevice, spriteBatch);
     }
 
     private void ApplySettings() 
@@ -87,7 +89,6 @@ public class Core : Game {
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
         
         // Update window size
-        screenRect = new Rectangle(0, 0, Settings.ResolutionX, Settings.ResolutionY); 
         graphics.PreferredBackBufferWidth = Settings.ResolutionX;
         graphics.PreferredBackBufferHeight = Settings.ResolutionY;
         graphics.ApplyChanges();
@@ -100,34 +101,17 @@ public class Core : Game {
     {
         _inputHandler.Update();
         _camera.Update();
-        base.Update(gameTime);
     }
 
-    protected override void Draw(GameTime gameTime) {
-        // Render black hole and bloom filter
-        Texture2D blackHoleTex = _blackHole.Draw(gameTime);
-        Texture2D bloomTex = _bloomFilter.Draw(blackHoleTex);
-        
-        // Apply the rendered textures to the screen
-        GraphicsDevice.SetRenderTarget(null);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-        spriteBatch.Draw(blackHoleTex, screenRect, Color.White);
-        spriteBatch.Draw(bloomTex, screenRect, Color.White);
-        spriteBatch.End();
-        
-        // Draw the text menu
-        spriteBatch.Begin();
-        _textRenderer.Draw(_textRenderer.GetMenuText(_currentMenu, _isMenuOpen));
-        spriteBatch.End();
-        
-        // End draw
-        base.Draw(gameTime);
+    protected override void Draw(GameTime gameTime) 
+    {
+        _frameRenderer.DrawFrame(gameTime);
         _frameStats.Update(gameTime);
     }
 
     private static void OpenTextEditor(ref Process process, string fileName) {
         if (process is { HasExited: false }) return;
-        string fileToOpen =  Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty, fileName);
+        string fileToOpen =  Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty, fileName);
 
         process = new Process();
         process.StartInfo = new ProcessStartInfo(fileToOpen) { UseShellExecute = true };
@@ -136,27 +120,27 @@ public class Core : Game {
 
     private void CreateInputEvents() {
         _inputHandler.GetAction(Keys.H) += state => {
-            if (state) _isMenuOpen ^= true;
+            if (state) IsMenuOpen ^= true;
         };
         
         _inputHandler.GetAction(Keys.D) += state => {
-            if (state) _currentMenu = Menu.Details;
+            if (state) CurrentMenu = Menu.Details;
         };
         
         _inputHandler.GetAction(Keys.B) += state => {
-            if (state) _currentMenu = Menu.Main;
+            if (state) CurrentMenu = Menu.Main;
         };
         
         _inputHandler.GetAction(Keys.G) += state => {
-            if (state) _currentMenu = Menu.Credits;
+            if (state) CurrentMenu = Menu.Credits;
         };
         
         _inputHandler.GetAction(Keys.S) += state => {
-            if (state) _currentMenu = Menu.Settings;
+            if (state) CurrentMenu = Menu.Settings;
         };
         
         _inputHandler.GetAction(Keys.C) += state => {
-            if (state) _currentMenu = Menu.Controls;
+            if (state) CurrentMenu = Menu.Controls;
         };
         
         _inputHandler.GetAction(Keys.Back) += state => {

@@ -13,20 +13,24 @@ public class Settings {
 	public const string SettingsFileName = "sim-settings.json";
 	public const string DefaultsFileName = "sim-defaults.json";
 
+	// Metadata
 	public string version = Core.VERSION;
 	public string build = Core.BUILD;
 	
+	// Window settings
 	public bool fullscreen = false;
 	public bool vsync = true;
 	public bool showMouse = true;
 	public float targetFramerate = 60.0f;
-	
 	public int resolutionX = 1280;
 	public int resolutionY = 720;
+
+	// Main simulation settings
 	public float fov = 60.0f;
 	public float simulationStepSize = 0.1f;
 	public float skyboxBrightness = 0.5f;
 	
+	// Disk settings
 	public float diskInnerRadius = 3.5f;
 	public float diskOuterRadius = 15.0f;
 	public float diskThickness = 0.2f;
@@ -35,6 +39,15 @@ public class Settings {
 	public float diskMinTemp = 4300.0f;
 	public float diskMaxVelocity = 0.1f;
 	public float diskMinVelocity = 0.01f;
+	
+	// Render mode settings
+	public bool videoRenderMode = false;
+	public float videoFrameRate = 24.0f;
+	public float videoDuration = 10.0f;
+	public string videoRenderLOCALDirectory = "RenderedFrames/Project01";
+	public float videoStoreWidthScale = 1.0f;
+	public float videoStoreHeightScale = 1.0f;
+	
 	
 	public static int ResolutionX => CurrentSettings.resolutionX;
 	public static int ResolutionY => CurrentSettings.resolutionY;

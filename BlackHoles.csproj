@@ -69,7 +69,6 @@
         <PackageReference Include="MonoGame.Framework.Compute.DesktopGL" Version="3.8.3" />
         <PackageReference Include="MonoGame.Content.Builder.Task.Compute" Version="3.8.3" />
         <PackageReference Include="newtonsoft.json" Version="13.0.3" />
-        <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5" />
     </ItemGroup>
     
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

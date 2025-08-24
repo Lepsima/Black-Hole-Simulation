@@ -61,13 +61,13 @@ public class BlackHole : Configurable {
 		computeShader.Parameters["cam_tan_half_fov"].SetValue(MathF.Tan(MathHelper.ToRadians(Settings.CurrentSettings.fov * 0.5f)));
 	}
 	
-	public Texture2D Draw(GameTime gameTime) {
+	public Texture2D Draw(float seconds) {
 		Vector3[] cameraData = Camera.Instance.GetShaderData();
 		computeShader.Parameters["cam_pos"].SetValue(cameraData[0]);
 		computeShader.Parameters["cam_forward"].SetValue(cameraData[1]);
 		computeShader.Parameters["cam_right"].SetValue(cameraData[2]);
 		computeShader.Parameters["cam_up"].SetValue(cameraData[3]);
-		computeShader.Parameters["disk_time"].SetValue((float)gameTime.TotalGameTime.TotalSeconds * 10.0f);
+		computeShader.Parameters["disk_time"].SetValue(seconds * 10.0f);
 		
 		computeShader.CurrentTechnique.Passes[0].ApplyCompute();
 		graphicsDevice.DispatchCompute(THREADS_X, THREADS_Y, THREADS_Z);

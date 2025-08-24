@@ -37,6 +37,13 @@ namespace BlackHoles;
 ///     If you use ToneMapping you should apply Bloom before that step.
 /// </summary>
 public class BloomFilter : Configurable, IDisposable {
+	
+	public static BloomFilter Instance { get; private set; }
+	
+	public BloomFilter() {
+		Instance = this;
+	}
+	
 	/// <summary>
 	///     Dispose our RenderTargets. This is not covered by the Garbage Collector so we have to do it manually
 	/// </summary>
