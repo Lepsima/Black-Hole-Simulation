@@ -108,7 +108,7 @@ public class Core : Game {
         _frameRenderer.DrawFrame(gameTime);
         _frameStats.Update(gameTime);
     }
-
+    
     private static void OpenTextEditor(ref Process process, string fileName) {
         if (process is { HasExited: false }) return;
         string fileToOpen =  Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty, fileName);
@@ -155,9 +155,16 @@ public class Core : Game {
             if (state) OpenTextEditor(ref settingsProcess, Settings.SettingsFileName);
         };
         
-        
         _inputHandler.GetAction(Keys.P) += state => {
             if (state) OpenTextEditor(ref defaultsProcess, Settings.DefaultsFileName);
+        };
+        
+        _inputHandler.GetAction(Keys.D1) += state => {
+            if (state) FrameRenderer.Instance.SetVideoPoint(true);
+        };
+        
+        _inputHandler.GetAction(Keys.D2) += state => {
+            if (state) FrameRenderer.Instance.SetVideoPoint(false);
         };
     }
 }
