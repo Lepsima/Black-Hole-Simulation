@@ -127,7 +127,7 @@ public class Core : Game {
 
     private static void OpenTextEditor(ref Process process, string fileName) {
         if (process is { HasExited: false }) return;
-        string fileToOpen = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + "\\" + fileName;
+        string fileToOpen =  Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty, fileName);
 
         process = new Process();
         process.StartInfo = new ProcessStartInfo(fileToOpen) { UseShellExecute = true };
