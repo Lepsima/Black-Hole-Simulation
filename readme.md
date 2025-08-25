@@ -13,6 +13,7 @@ _The standard accretion disk look._
 - The emmited wavelength is subject to red and blueshift and then converted back to an accurate RGB representation
 - Skybox distorsion, the stars in the background will also distort as the rays bend
 - No rendering or wait time, all the rays are simulated in real time at very decent framerates (for black hole standards)
+- Video rendering mode (enabled by changing the setting "videoRenderMode" to true)
 
 <img width="1740" height="634" alt="bh_blue" src="https://github.com/user-attachments/assets/8e21cc71-cd43-4706-ba52-e94bcbcf2969" />
 
@@ -67,6 +68,17 @@ After that, bloom is applied (see credits below) and the menu is rendered.
 
 _The same standard look, different angle and better skybox visibility._
 <br />
+
+## Video Pre-rendering (Stored as images)
+A feature that automatically animates the camera between 2 positions and renders all the frames in between, storing them in the desired folder.
+
+This feature is very slow due to file write speeds, monogame doesn't seem to have good image writing support and restricted some of my multithreading attempts, becasue of that, please keep the resolution size small and/or framerate low.
+
+To enable this feature go to the "sim-settings.json" or click "O" with the app open:
+- Set "videoRenderMode" to true
+- Change the "videoFrameRate" and "videoDuration"
+- If needed change "videoRenderLOCALDirectory" to set the image output folder
+- Apply the changes and follow the instructions
  
 # Credits & Links
 
