@@ -15,7 +15,7 @@ public enum Menu {
 
 public class TextRenderer {
 	public static TextRenderer Instance { get; private set; }
-	
+
 	private const float Margin = 20.0f;
 	private const float Spacing = 10.0f;
 	
@@ -31,8 +31,8 @@ public class TextRenderer {
 	public TextRenderer() {
 		Instance = this;
 	}
-	
-	public string[] GetMenuText(Menu menu, bool isMenuOpen) {
+
+	public static string[] GetMenuText(Menu menu, bool isMenuOpen) {
 		List<string> lines = [ isMenuOpen ? "[H] to close" : "[H] to open" ];
 		if (!isMenuOpen) return lines.ToArray();
 		
@@ -112,13 +112,19 @@ public class TextRenderer {
 		
         return lines.ToArray();
 	}
+
+	public void DrawMenuText(Menu menu, bool isMenuOpen) {
+		Draw(GetMenuText(menu, isMenuOpen));
+	}
 	
 	public void Draw(string[] text) {
+		spriteBatch.Begin();
 		_textPosition = new Vector2(Margin, Margin);
-		foreach (string s in text) DrawText(s);
+		foreach (string s in text) DrawLine(s);
+		spriteBatch.End();
 	}
 
-	private void DrawText(string text) {
+	private void DrawLine(string text) {
 		Vector2 textSize = spriteFont.MeasureString(text);
 		
 		spriteBatch.DrawString(spriteFont, text, _textPosition, Color.LightGreen,

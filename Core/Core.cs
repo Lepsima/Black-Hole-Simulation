@@ -10,12 +10,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BlackHoles;
 public class Core : Game {
-    public const string VERSION = "v1.0";
+    public static Core Instance;
+    
+    public const string VERSION = "v1.1";
     public const string BUILD = "b1";
     
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    private Rectangle screenRect;
 
     private Camera _camera;
     private BlackHole _blackHole;
@@ -23,15 +24,17 @@ public class Core : Game {
     private BloomFilter _bloomFilter;
     private TextRenderer _textRenderer;
     private InputHandler _inputHandler;
+    private FrameRenderer _frameRenderer;
 
-    private bool _isMenuOpen;
-    private Menu _currentMenu = Menu.Main;
+    public static bool IsMenuOpen { get; private set; }
+    public static Menu CurrentMenu { get; private set; } = Menu.Main;
 
     private Process settingsProcess;
     private Process defaultsProcess;
     
-    public Core()
-    {
+    public Core() {
+        Instance = this;
+        
         // Load settings from file
         Settings.CreateIfMissing(Settings.DefaultsFileName);
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
@@ -44,14 +47,10 @@ public class Core : Game {
         // Static parameters
         Content.RootDirectory = "Content";
         Window.Title = "Black Hole Simulation";
-        IsMouseVisible = settings1.showMouse;
-        TargetElapsedTime = TimeSpan.FromSeconds(1.0d / settings1.targetFramerate);
-
+        
         // Set the graphics manager's settings
         graphics = new GraphicsDeviceManager(this);
         graphics.GraphicsProfile = GraphicsProfile.HiDef;
-        graphics.SynchronizeWithVerticalRetrace = settings1.vsync;
-        graphics.IsFullScreen = settings1.fullscreen;
     }
 
     protected override void Initialize() 
@@ -63,6 +62,7 @@ public class Core : Game {
         _bloomFilter = new BloomFilter();
         _textRenderer = new TextRenderer();
         _inputHandler = new InputHandler();
+        _frameRenderer = new FrameRenderer();
 
         // Create events for keyboard presses
         CreateInputEvents();
@@ -79,6 +79,7 @@ public class Core : Game {
         _textRenderer.Load(Content, spriteBatch);
         _blackHole.Load(GraphicsDevice, Content);
         _bloomFilter.Load(GraphicsDevice, Content);
+        _frameRenderer.Load(GraphicsDevice, spriteBatch);
     }
 
     private void ApplySettings() 
@@ -86,8 +87,12 @@ public class Core : Game {
         // Read updated settings
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
         
+        graphics.SynchronizeWithVerticalRetrace = Settings.CurrentSettings.vsync;
+        graphics.IsFullScreen = Settings.CurrentSettings.fullscreen;
+        IsMouseVisible = Settings.CurrentSettings.showMouse;
+        TargetElapsedTime = TimeSpan.FromSeconds(1.0d / Settings.CurrentSettings.targetFramerate);
+        
         // Update window size
-        screenRect = new Rectangle(0, 0, Settings.ResolutionX, Settings.ResolutionY); 
         graphics.PreferredBackBufferWidth = Settings.ResolutionX;
         graphics.PreferredBackBufferHeight = Settings.ResolutionY;
         graphics.ApplyChanges();
@@ -100,34 +105,17 @@ public class Core : Game {
     {
         _inputHandler.Update();
         _camera.Update();
-        base.Update(gameTime);
     }
 
-    protected override void Draw(GameTime gameTime) {
-        // Render black hole and bloom filter
-        Texture2D blackHoleTex = _blackHole.Draw(gameTime);
-        Texture2D bloomTex = _bloomFilter.Draw(blackHoleTex);
-        
-        // Apply the rendered textures to the screen
-        GraphicsDevice.SetRenderTarget(null);
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-        spriteBatch.Draw(blackHoleTex, screenRect, Color.White);
-        spriteBatch.Draw(bloomTex, screenRect, Color.White);
-        spriteBatch.End();
-        
-        // Draw the text menu
-        spriteBatch.Begin();
-        _textRenderer.Draw(_textRenderer.GetMenuText(_currentMenu, _isMenuOpen));
-        spriteBatch.End();
-        
-        // End draw
-        base.Draw(gameTime);
+    protected override void Draw(GameTime gameTime) 
+    {
+        _frameRenderer.DrawFrame(gameTime);
         _frameStats.Update(gameTime);
     }
-
+    
     private static void OpenTextEditor(ref Process process, string fileName) {
         if (process is { HasExited: false }) return;
-        string fileToOpen = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + "\\" + fileName;
+        string fileToOpen =  Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty, fileName);
 
         process = new Process();
         process.StartInfo = new ProcessStartInfo(fileToOpen) { UseShellExecute = true };
@@ -136,27 +124,27 @@ public class Core : Game {
 
     private void CreateInputEvents() {
         _inputHandler.GetAction(Keys.H) += state => {
-            if (state) _isMenuOpen ^= true;
+            if (state) IsMenuOpen ^= true;
         };
         
         _inputHandler.GetAction(Keys.D) += state => {
-            if (state) _currentMenu = Menu.Details;
+            if (state) CurrentMenu = Menu.Details;
         };
         
         _inputHandler.GetAction(Keys.B) += state => {
-            if (state) _currentMenu = Menu.Main;
+            if (state) CurrentMenu = Menu.Main;
         };
         
         _inputHandler.GetAction(Keys.G) += state => {
-            if (state) _currentMenu = Menu.Credits;
+            if (state) CurrentMenu = Menu.Credits;
         };
         
         _inputHandler.GetAction(Keys.S) += state => {
-            if (state) _currentMenu = Menu.Settings;
+            if (state) CurrentMenu = Menu.Settings;
         };
         
         _inputHandler.GetAction(Keys.C) += state => {
-            if (state) _currentMenu = Menu.Controls;
+            if (state) CurrentMenu = Menu.Controls;
         };
         
         _inputHandler.GetAction(Keys.Back) += state => {
@@ -171,9 +159,16 @@ public class Core : Game {
             if (state) OpenTextEditor(ref settingsProcess, Settings.SettingsFileName);
         };
         
-        
         _inputHandler.GetAction(Keys.P) += state => {
             if (state) OpenTextEditor(ref defaultsProcess, Settings.DefaultsFileName);
+        };
+        
+        _inputHandler.GetAction(Keys.D1) += state => {
+            if (state) FrameRenderer.Instance.SetVideoPoint(true);
+        };
+        
+        _inputHandler.GetAction(Keys.D2) += state => {
+            if (state) FrameRenderer.Instance.SetVideoPoint(false);
         };
     }
 }

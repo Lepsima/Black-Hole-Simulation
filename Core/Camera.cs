@@ -36,6 +36,24 @@ public class Camera {
 		return data;
 	}
 
+	public RenderPoint GetRenderPoint() {
+		return new RenderPoint {
+			zoom = radius,
+			orbit_azimuth = orbit_azimuth,
+			orbit_elevation = orbit_elevation,
+			aim_azimuth = aim_azimuth,
+			aim_elevation = aim_elevation,
+		};
+	}
+
+	public void SetRenderData(RenderPoint renderPoint) {
+		radius = renderPoint.zoom;
+		orbit_azimuth = renderPoint.orbit_azimuth;
+		orbit_elevation = renderPoint.orbit_elevation;
+		aim_azimuth = renderPoint.aim_azimuth;
+		aim_elevation = renderPoint.aim_elevation;
+	}
+
 	private Vector3 GetVector(float elevation, float azimuth) {
 		return new Vector3(
 			radius * MathF.Sin(elevation) * MathF.Cos(azimuth),
