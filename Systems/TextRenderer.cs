@@ -32,7 +32,7 @@ public class TextRenderer {
 		Instance = this;
 	}
 
-	private static string[] GetMenuText(Menu menu, bool isMenuOpen) {
+	public static string[] GetMenuText(Menu menu, bool isMenuOpen) {
 		List<string> lines = [ isMenuOpen ? "[H] to close" : "[H] to open" ];
 		if (!isMenuOpen) return lines.ToArray();
 		

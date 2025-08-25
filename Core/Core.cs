@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BlackHoles;
 public class Core : Game {
+    public static Core Instance;
+    
     public const string VERSION = "v1.0";
     public const string BUILD = "b1";
     
@@ -30,8 +32,9 @@ public class Core : Game {
     private Process settingsProcess;
     private Process defaultsProcess;
     
-    public Core()
-    {
+    public Core() {
+        Instance = this;
+        
         // Load settings from file
         Settings.CreateIfMissing(Settings.DefaultsFileName);
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
@@ -44,14 +47,10 @@ public class Core : Game {
         // Static parameters
         Content.RootDirectory = "Content";
         Window.Title = "Black Hole Simulation";
-        IsMouseVisible = settings1.showMouse;
-        TargetElapsedTime = TimeSpan.FromSeconds(1.0d / settings1.targetFramerate);
-
+        
         // Set the graphics manager's settings
         graphics = new GraphicsDeviceManager(this);
         graphics.GraphicsProfile = GraphicsProfile.HiDef;
-        graphics.SynchronizeWithVerticalRetrace = settings1.vsync;
-        graphics.IsFullScreen = settings1.fullscreen;
     }
 
     protected override void Initialize() 
@@ -87,6 +86,11 @@ public class Core : Game {
     {
         // Read updated settings
         Settings.AutoLoadCurrentSettings(Settings.SettingsFileName);
+        
+        graphics.SynchronizeWithVerticalRetrace = Settings.CurrentSettings.vsync;
+        graphics.IsFullScreen = Settings.CurrentSettings.fullscreen;
+        IsMouseVisible = Settings.CurrentSettings.showMouse;
+        TargetElapsedTime = TimeSpan.FromSeconds(1.0d / Settings.CurrentSettings.targetFramerate);
         
         // Update window size
         graphics.PreferredBackBufferWidth = Settings.ResolutionX;

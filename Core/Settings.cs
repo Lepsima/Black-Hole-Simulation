@@ -45,9 +45,6 @@ public class Settings {
 	public float videoFrameRate = 24.0f;
 	public float videoDuration = 10.0f;
 	public string videoRenderLOCALDirectory = "RenderedFrames/Project01";
-	public float videoStoreWidthScale = 1.0f;
-	public float videoStoreHeightScale = 1.0f;
-	
 	
 	public static int ResolutionX => CurrentSettings.resolutionX;
 	public static int ResolutionY => CurrentSettings.resolutionY;
