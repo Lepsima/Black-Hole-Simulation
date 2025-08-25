@@ -12,7 +12,7 @@ namespace BlackHoles;
 public class Core : Game {
     public static Core Instance;
     
-    public const string VERSION = "v1.0";
+    public const string VERSION = "v1.1";
     public const string BUILD = "b1";
     
     private readonly GraphicsDeviceManager graphics;
